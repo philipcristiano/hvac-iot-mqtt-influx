@@ -189,7 +189,7 @@ send_to_influxdb(Line) ->
         line => Line
     }),
 
-    Headers = [{"Authorization", "Token " ++ Token}],
+    Headers = [{<<"Authorization">>, erlang:list_to_binary("Token " ++ Token)}],
 
     {ok, Code, RespHeaders, ClientRef} = hackney:request(post, URL, Headers, Line, []),
 
