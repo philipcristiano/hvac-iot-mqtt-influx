@@ -7,19 +7,23 @@
 %%%-------------------------------------------------------------------
 
 -module(hvac_iot_mqtt_to_influx).
+
 -include_lib("kernel/include/logger.hrl").
+
 -behaviour(gen_server).
 
 %% API functions
 -export([start_link/0]).
 
 %% gen_server callbacks
--export([init/1,
-         handle_call/3,
-         handle_cast/2,
-         handle_info/2,
-         terminate/2,
-         code_change/3]).
+-export([
+    init/1,
+    handle_call/3,
+    handle_cast/2,
+    handle_info/2,
+    terminate/2,
+    code_change/3
+]).
 
 -record(state, {mqtt_client_pid}).
 
@@ -39,9 +43,9 @@
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
-
 connect_mqtt() ->
     gen_server:cast(?MODULE, connect_mqtt).
+
 %%%===================================================================
 %%% gen_server callbacks
 %%%===================================================================
@@ -92,24 +96,27 @@ handle_call(_Request, _From, State) ->
 %%                                  {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_cast(connect_mqtt, State=#state{}) ->
+handle_cast(connect_mqtt, State = #state{}) ->
     Host = application:get_env(hvac_iot, mqtt_host, "localhost"),
     User = application:get_env(hvac_iot, mqtt_username, "mqtt"),
     Pass = application:get_env(hvac_iot, mqtt_password, "mqtt"),
 
-    ?LOG_INFO(#{what => "MQTT-to-InfluxDB connecting",
-                host => Host}),
+    ?LOG_INFO(#{
+        what => "MQTT-to-InfluxDB connecting",
+        host => Host
+    }),
     {ok, MCP} = emqtt:start_link([
-      {clientid, ?MQTT_CLIENT_ID},
-      {host, Host},
-      {username, User},
-      {password, Pass}]),
+        {clientid, ?MQTT_CLIENT_ID},
+        {host, Host},
+        {username, User},
+        {password, Pass}
+    ]),
     {ok, _Props} = emqtt:connect(MCP),
 
     SubOpts = [{qos, 1}],
     {ok, _Props, _ReasonCodes} = emqtt:subscribe(MCP, #{}, [{<<"/metrics">>, SubOpts}]),
 
-    {noreply, State#state{mqtt_client_pid=MCP}};
+    {noreply, State#state{mqtt_client_pid = MCP}};
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
@@ -123,7 +130,7 @@ handle_cast(_Msg, State) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_info({publish , Msg=#{topic:= <<"/metrics">>, payload:=Payload}}, State) ->
+handle_info({publish, Msg = #{topic := <<"/metrics">>, payload := Payload}}, State) ->
     io:format("publish ~p~n", [Msg]),
     send_to_influxdb(Payload),
     {noreply, State};
@@ -174,12 +181,12 @@ send_to_influxdb(Line) ->
     Path = "/api/v2/write?" ++ Query,
     URL = "http://" ++ Host ++ ":" ++ SPort ++ Path,
     ?LOG_DEBUG(#{
-      what => "Influx Line Request",
-      host => Host,
-      port => Port,
-      org => Org,
-      bucket => Bucket,
-      line => Line
+        what => "Influx Line Request",
+        host => Host,
+        port => Port,
+        org => Org,
+        bucket => Bucket,
+        line => Line
     }),
 
     Headers = [{"Authorization", "Token " ++ Token}],
@@ -187,21 +194,22 @@ send_to_influxdb(Line) ->
     {ok, Code, RespHeaders, ClientRef} = hackney:request(post, URL, Headers, Line, []),
 
     ?LOG_DEBUG(#{
-      what => "Influx Line Request Response",
-      host => Host,
-      port => Port,
-      org => Org,
-      bucket => Bucket,
-      line => Line,
-      code => Code,
-      response_headers => RespHeaders
+        what => "Influx Line Request Response",
+        host => Host,
+        port => Port,
+        org => Org,
+        bucket => Bucket,
+        line => Line,
+        code => Code,
+        response_headers => RespHeaders
     }),
 
     case Code of
-      204 -> ok;
-      _ ->
-          {ok, Body} = hackney:body(ClientRef),
-          io:format("Resp ~p~n", [{Code, Body}])
+        204 ->
+            ok;
+        _ ->
+            {ok, Body} = hackney:body(ClientRef),
+            io:format("Resp ~p~n", [{Code, Body}])
     end,
 
     ok.
