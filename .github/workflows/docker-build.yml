@@ -3,12 +3,12 @@ name: Docker Build Upload and eventually Deploy
 on:
   push:
     branches:
-      - trunk
+      - main
     tags:
       - '*'
   pull_request:
     branches:
-      - trunk
+      - main
 
 jobs:
 
