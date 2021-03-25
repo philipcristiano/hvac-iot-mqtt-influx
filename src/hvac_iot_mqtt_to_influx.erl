@@ -123,6 +123,10 @@ handle_cast(_Msg, State) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
+handle_info({publish , Msg=#{topic:= <<"/metrics">>, payload:=Payload}}, State) ->
+    io:format("publish ~p~n", [Msg]),
+    send_to_influxdb(Payload),
+    {noreply, State};
 handle_info(Info, State) ->
     io:format("Info ~p~n", [Info]),
     {noreply, State}.
@@ -155,3 +159,49 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+%%%
+
+send_to_influxdb(Line) ->
+    Host = application:get_env(hvac_iot, influxdb_host, "localhost"),
+    Port = application:get_env(hvac_iot, influxdb_port, 8086),
+    Token = application:get_env(hvac_iot, influxdb_token, "default_token"),
+    Org = application:get_env(hvac_iot, influxdb_org, "default_org"),
+    Bucket = application:get_env(hvac_iot, influxdb_bucket, "default_bucket"),
+
+    SPort = erlang:integer_to_list(Port),
+
+    Query = uri_string:compose_query([{"org", Org}, {"bucket", Bucket}, {"precision", "s"}]),
+    Path = "/api/v2/write?" ++ Query,
+    URL = "http://" ++ Host ++ ":" ++ SPort ++ Path,
+    ?LOG_DEBUG(#{
+      what => "Influx Line Request",
+      host => Host,
+      port => Port,
+      org => Org,
+      bucket => Bucket,
+      line => Line
+    }),
+
+    Headers = [{"Authorization", "Token " ++ Token}],
+
+    {ok, Code, RespHeaders, ClientRef} = hackney:request(post, URL, Headers, Line, []),
+
+    ?LOG_DEBUG(#{
+      what => "Influx Line Request Response",
+      host => Host,
+      port => Port,
+      org => Org,
+      bucket => Bucket,
+      line => Line,
+      code => Code,
+      response_headers => RespHeaders
+    }),
+
+    case Code of
+      204 -> ok;
+      _ ->
+          {ok, Body} = hackney:body(ClientRef),
+          io:format("Resp ~p~n", [{Code, Body}])
+    end,
+
+    ok.
