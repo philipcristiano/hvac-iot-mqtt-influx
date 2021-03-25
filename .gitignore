@@ -4,6 +4,8 @@
 *.plt
 erl_crash.dump
 .concrete/DEV_MODE
+/ebin
+/_rel
 
 # rebar 2.x
 .rebar
@@ -21,4 +23,6 @@ _checkouts/
 
 # Project
 .env
+/local.debugconfig
+/hvac_iot.d
 /local.config

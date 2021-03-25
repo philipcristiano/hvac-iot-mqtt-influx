@@ -8,7 +8,6 @@ BUILD_DEPS = \
 	version.mk \
 	erlfmt
 
-
 dep_emqtt = git https://github.com/emqx/emqtt.git v1.2.3
 dep_erlfmt = git https://github.com/WhatsApp/erlfmt.git v0.8.0
 dep_version.mk = git https://github.com/manifest/version.mk.git v0.2.0
