@@ -115,6 +115,7 @@ handle_cast(connect_mqtt, State = #state{}) ->
 
     SubOpts = [{qos, 1}],
     {ok, _Props, _ReasonCodes} = emqtt:subscribe(MCP, #{}, [{<<"/metrics">>, SubOpts}]),
+    {ok, _Props, _ReasonCodes} = emqtt:subscribe(MCP, #{}, [{<<"/metrics_json">>, SubOpts}]),
 
     {noreply, State#state{mqtt_client_pid = MCP}};
 handle_cast(_Msg, State) ->
@@ -131,8 +132,21 @@ handle_cast(_Msg, State) ->
 %% @end
 %%--------------------------------------------------------------------
 handle_info({publish, Msg = #{topic := <<"/metrics">>, payload := Payload}}, State) ->
-    io:format("publish ~p~n", [Msg]),
+    ?LOG_DEBUG(#{
+        what => metrics_message,
+        payload => Payload,
+        msg => Msg}),
     send_to_influxdb(Payload),
+    {noreply, State};
+handle_info({publish, Msg = #{topic := <<"/metrics_json">>, payload := Payload}}, State) ->
+    Data = jsx:decode(Payload, [return_maps]),
+    InfluxMsg = metric_data_to_influx_line(Data),
+    send_to_influxdb(InfluxMsg),
+    ?LOG_DEBUG(#{
+        what => metrics_json_message,
+        payload => Payload,
+        influx_msg => InfluxMsg,
+        msg => Msg}),
     {noreply, State};
 handle_info(Info, State) ->
     io:format("Info ~p~n", [Info]),
@@ -213,3 +227,55 @@ send_to_influxdb(Line) ->
     end,
 
     ok.
+
+metric_data_to_influx_line(#{
+    <<"type">> := Type,
+    <<"meta">> := Meta,
+    <<"data">> := Data}) when is_binary(Type) ->
+
+    InfluxMeta = map_to_influx(Meta),
+    << _Comma:1/binary, InfluxData/binary >> = map_to_influx(Data),
+
+    << Type/binary, InfluxMeta/binary, <<" ">>/binary, InfluxData/binary>>;
+
+
+metric_data_to_influx_line(#{
+    <<"id">> := ID,
+    <<"sid">> := SID,
+    <<"id_hex">> := IDHex,
+    <<"temp_c">> := TempC,
+    <<"rh">> := RH,
+    <<"rssi">> := RSSI,
+    <<"vbat">> := VBat}) ->
+
+    IDBin = list_to_binary(integer_to_list(ID)),
+    RSSIBin = list_to_binary(integer_to_list(RSSI)),
+
+    TempCBin = float_to_binary(TempC),
+    RHBin = float_to_binary(RH),
+    VBatBin = float_to_binary(VBat),
+
+
+    << <<"sensor_reading">>/binary,
+       <<",id=">>/binary, IDBin/binary,
+       <<",sid=">>/binary, SID/binary,
+       <<",id_hex=">>/binary, IDHex/binary,
+
+       <<" rssi=">>/binary, RSSIBin/binary,
+       <<",tc=">>/binary, TempCBin/binary,
+       <<",rh=">>/binary, RHBin/binary,
+       <<",vbat=">>/binary, VBatBin/binary
+    >>.
+
+map_to_influx(M) when is_map(M) ->
+    maps:fold(fun(K, V, AccIn) ->
+        VB = to_bin(V),
+        << AccIn/binary, <<",">>/binary, K/binary, <<"=">>/binary, VB/binary >>
+    end, <<"">>, M).
+
+to_bin(B) when is_binary(B) ->
+    B;
+to_bin(I) when is_integer(I) ->
+    list_to_binary(integer_to_list(I));
+to_bin(F) when is_float(F) ->
+    float_to_binary(F, [{decimals, 4}, compact]).
