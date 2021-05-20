@@ -4,7 +4,8 @@ PROJECT_VERSION = 0.1.0
 
 DEPS = \
 	emqtt \
-	hackney
+	hackney \
+	jsx
 BUILD_DEPS = \
 	version.mk \
 	erlfmt
@@ -12,6 +13,7 @@ BUILD_DEPS = \
 dep_emqtt = git https://github.com/emqx/emqtt.git v1.2.3
 dep_erlfmt = git https://github.com/WhatsApp/erlfmt.git v0.8.0
 dep_hackney = hex 1.16.0
+dep_jsx = git https://github.com/talentdeficit/jsx.git v2.10.0
 dep_version.mk = git https://github.com/manifest/version.mk.git v0.2.0
 
 SHELL_OPTS = -eval 'application:ensure_all_started(hvac_iot).' -config sys +S2
