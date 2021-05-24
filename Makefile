@@ -14,7 +14,7 @@ BUILD_DEPS = \
 dep_emqtt = git https://github.com/emqx/emqtt.git v1.2.3
 dep_eraven = git https://github.com/getkimball/eraven.git 2020-05-20
 dep_erlfmt = git https://github.com/WhatsApp/erlfmt.git v0.8.0
-dep_hackney = hex 1.16.0
+dep_hackney = hex 1.17.4
 dep_jsx = git https://github.com/talentdeficit/jsx.git v2.10.0
 dep_version.mk = git https://github.com/manifest/version.mk.git v0.2.0
 
