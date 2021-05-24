@@ -135,7 +135,8 @@ handle_info({publish, Msg = #{topic := <<"/metrics">>, payload := Payload}}, Sta
     ?LOG_DEBUG(#{
         what => metrics_message,
         payload => Payload,
-        msg => Msg}),
+        msg => Msg
+    }),
     send_to_influxdb(Payload),
     {noreply, State};
 handle_info({publish, Msg = #{topic := <<"/metrics_json">>, payload := Payload}}, State) ->
@@ -146,7 +147,8 @@ handle_info({publish, Msg = #{topic := <<"/metrics_json">>, payload := Payload}}
         what => metrics_json_message,
         payload => Payload,
         influx_msg => InfluxMsg,
-        msg => Msg}),
+        msg => Msg
+    }),
     {noreply, State};
 handle_info(Info, State) ->
     io:format("Info ~p~n", [Info]),
@@ -225,10 +227,10 @@ send_to_influxdb(Line) ->
             ok;
         _ ->
             {ok, Body} =
-            ?LOG_ERROR(#{
-                what => influx_http_error,
-                response => Body
-            })
+                ?LOG_ERROR(#{
+                    what => influx_http_error,
+                    response => Body
+                })
     end,
 
     ok.
@@ -236,14 +238,12 @@ send_to_influxdb(Line) ->
 metric_data_to_influx_line(#{
     <<"type">> := Type,
     <<"meta">> := Meta,
-    <<"data">> := Data}) when is_binary(Type) ->
-
+    <<"data">> := Data
+}) when is_binary(Type) ->
     InfluxMeta = map_to_influx(Meta),
-    << _Comma:1/binary, InfluxData/binary >> = map_to_influx(Data),
+    <<_Comma:1/binary, InfluxData/binary>> = map_to_influx(Data),
 
-    << Type/binary, InfluxMeta/binary, <<" ">>/binary, InfluxData/binary>>;
-
-
+    <<Type/binary, InfluxMeta/binary, <<" ">>/binary, InfluxData/binary>>;
 metric_data_to_influx_line(#{
     <<"id">> := ID,
     <<"sid">> := SID,
@@ -251,8 +251,8 @@ metric_data_to_influx_line(#{
     <<"temp_c">> := TempC,
     <<"rh">> := RH,
     <<"rssi">> := RSSI,
-    <<"vbat">> := VBat}) ->
-
+    <<"vbat">> := VBat
+}) ->
     IDBin = list_to_binary(integer_to_list(ID)),
     RSSIBin = list_to_binary(integer_to_list(RSSI)),
 
@@ -260,23 +260,21 @@ metric_data_to_influx_line(#{
     RHBin = float_to_binary(RH),
     VBatBin = float_to_binary(VBat),
 
+    <<<<"sensor_reading">>/binary, <<",id=">>/binary, IDBin/binary, <<",sid=">>/binary, SID/binary,
+        <<",id_hex=">>/binary, IDHex/binary,
 
-    << <<"sensor_reading">>/binary,
-       <<",id=">>/binary, IDBin/binary,
-       <<",sid=">>/binary, SID/binary,
-       <<",id_hex=">>/binary, IDHex/binary,
-
-       <<" rssi=">>/binary, RSSIBin/binary,
-       <<",tc=">>/binary, TempCBin/binary,
-       <<",rh=">>/binary, RHBin/binary,
-       <<",vbat=">>/binary, VBatBin/binary
-    >>.
+        <<" rssi=">>/binary, RSSIBin/binary, <<",tc=">>/binary, TempCBin/binary, <<",rh=">>/binary,
+        RHBin/binary, <<",vbat=">>/binary, VBatBin/binary>>.
 
 map_to_influx(M) when is_map(M) ->
-    maps:fold(fun(K, V, AccIn) ->
-        VB = to_bin(V),
-        << AccIn/binary, <<",">>/binary, K/binary, <<"=">>/binary, VB/binary >>
-    end, <<"">>, M).
+    maps:fold(
+        fun(K, V, AccIn) ->
+            VB = to_bin(V),
+            <<AccIn/binary, <<",">>/binary, K/binary, <<"=">>/binary, VB/binary>>
+        end,
+        <<"">>,
+        M
+    ).
 
 to_bin(B) when is_binary(B) ->
     B;

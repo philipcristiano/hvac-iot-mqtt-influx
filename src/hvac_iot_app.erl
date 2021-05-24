@@ -1,6 +1,7 @@
 -module(hvac_iot_app).
 
 -behaviour(application).
+
 -include_lib("kernel/include/logger.hrl").
 
 -export([start/2]).
