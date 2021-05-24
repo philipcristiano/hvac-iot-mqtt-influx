@@ -226,11 +226,10 @@ send_to_influxdb(Line) ->
         204 ->
             ok;
         _ ->
-            {ok, Body} =
-                ?LOG_ERROR(#{
-                    what => influx_http_error,
-                    response => Body
-                })
+            ?LOG_ERROR(#{
+                what => influx_http_error,
+                response => Body
+            })
     end,
 
     ok.
