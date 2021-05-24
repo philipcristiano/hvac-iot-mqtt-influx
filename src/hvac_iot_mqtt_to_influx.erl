@@ -218,12 +218,17 @@ send_to_influxdb(Line) ->
         response_headers => RespHeaders
     }),
 
+    {ok, Body} = hackney:body(ClientRef),
+
     case Code of
         204 ->
             ok;
         _ ->
-            {ok, Body} = hackney:body(ClientRef),
-            io:format("Resp ~p~n", [{Code, Body}])
+            {ok, Body} =
+            ?LOG_ERROR(#{
+                what => influx_http_error,
+                response => Body
+            })
     end,
 
     ok.
