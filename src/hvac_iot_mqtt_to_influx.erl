@@ -207,20 +207,18 @@ send_to_influxdb(Line) ->
 
     Headers = [{<<"Authorization">>, erlang:list_to_binary("Token " ++ Token)}],
 
-    {ok, Code, RespHeaders, ClientRef} = hackney:request(post, URL, Headers, Line, []),
+    Resp = hackney:request(post, URL, Headers, Line, []),
+    handle_influxdb_response(URL, Resp).
 
+handle_influxdb_response(URL, {ok, Code, RespHeaders, ClientRef}) ->
+    {ok, Body} = hackney:body(ClientRef),
     ?LOG_DEBUG(#{
         what => "Influx Line Request Response",
-        host => Host,
-        port => Port,
-        org => Org,
-        bucket => Bucket,
-        line => Line,
+        url => URL,
         code => Code,
+        body => Body,
         response_headers => RespHeaders
     }),
-
-    {ok, Body} = hackney:body(ClientRef),
 
     case Code of
         204 ->
@@ -228,10 +226,17 @@ send_to_influxdb(Line) ->
         _ ->
             ?LOG_ERROR(#{
                 what => influx_http_error,
+                url => URL,
                 response => Body
             })
     end,
 
+    ok;
+handle_influxdb_response(URL, {error, econnrefused}) ->
+    ?LOG_INFO(#{
+        what => "Influx HTTP Connection refused",
+        url => URL
+    }),
     ok.
 
 metric_data_to_influx_line(#{
