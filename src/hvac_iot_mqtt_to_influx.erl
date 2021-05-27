@@ -13,7 +13,10 @@
 -behaviour(gen_server).
 
 %% API functions
--export([start_link/0]).
+-export([
+    start_link/0,
+    connect_mqtt/0
+]).
 
 %% gen_server callbacks
 -export([
@@ -63,7 +66,7 @@ connect_mqtt() ->
 %%--------------------------------------------------------------------
 init([]) ->
     ?LOG_INFO(#{what => "MQTT-to-InfluxDB starting"}),
-    io:format("Starting"),
+    process_flag(trap_exit, true),
 
     connect_mqtt(),
     {ok, #state{}}.
@@ -102,7 +105,11 @@ handle_cast(connect_mqtt, State = #state{}) ->
     Pass = application:get_env(hvac_iot, mqtt_password, "mqtt"),
 
     ?LOG_INFO(#{
-        what => "MQTT-to-InfluxDB connecting",
+        what => "MQTT-to-InfluxDB service sleep starting",
+        host => Host
+    }),
+    ?LOG_INFO(#{
+        what => "MQTT-to-InfluxDB service wake starting",
         host => Host
     }),
     {ok, MCP} = emqtt:start_link([
@@ -111,13 +118,31 @@ handle_cast(connect_mqtt, State = #state{}) ->
         {username, User},
         {password, Pass}
     ]),
-    {ok, _Props} = emqtt:connect(MCP),
+    ?LOG_INFO(#{
+        what => "MQTT-to-InfluxDB connecting",
+        host => Host
+    }),
 
-    SubOpts = [{qos, 1}],
-    {ok, _Props, _ReasonCodes} = emqtt:subscribe(MCP, #{}, [{<<"/metrics">>, SubOpts}]),
-    {ok, _Props, _ReasonCodes} = emqtt:subscribe(MCP, #{}, [{<<"/metrics_json">>, SubOpts}]),
+    case emqtt:connect(MCP) of
+        {ok, _Props} ->
+            ?LOG_INFO(#{
+                what => "MQTT-to-InfluxDB connection attempt",
+                host => Host
+            }),
 
-    {noreply, State#state{mqtt_client_pid = MCP}};
+            SubOpts = [{qos, 1}],
+            {ok, _Props, _ReasonCodes} = emqtt:subscribe(MCP, #{}, [{<<"/metrics">>, SubOpts}]),
+            {ok, _Props, _ReasonCodes} = emqtt:subscribe(MCP, #{}, [{<<"/metrics_json">>, SubOpts}]),
+
+            {noreply, State#state{mqtt_client_pid = MCP}};
+        {error, Reason} ->
+            ?LOG_INFO(#{
+                what => "MQTT-to-InfluxDB connection attempt failed",
+                host => Host,
+                reason => Reason
+            }),
+            {noreply, State#state{mqtt_client_pid = MCP}}
+    end;
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
@@ -149,6 +174,15 @@ handle_info({publish, Msg = #{topic := <<"/metrics_json">>, payload := Payload}}
         influx_msg => InfluxMsg,
         msg => Msg
     }),
+    {noreply, State};
+handle_info({'EXIT', Pid, Reason}, State = #state{mqtt_client_pid = Pid}) ->
+    ?LOG_INFO(#{
+        what => "MQTT Connect process exited, will try again",
+        pid => Pid,
+        reason => Reason
+    }),
+
+    {ok, _TRef} = timer:apply_after(5000, ?MODULE, connect_mqtt, []),
     {noreply, State};
 handle_info(Info, State) ->
     io:format("Info ~p~n", [Info]),
