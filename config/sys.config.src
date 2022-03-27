@@ -6,4 +6,4 @@
     {handler, default, logger_std_h, #{}}
   ]}
 ]},
-"/hvac-iot/app"].
+"${CONFIG_ROOT}/app"].

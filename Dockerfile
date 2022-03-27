@@ -10,6 +10,7 @@ RUN mv /app/src/_rel/hvac_iot_release/hvac_iot_*.tar.gz /app.tar.gz
 FROM debian:buster
 
 ENV LOG_LEVEL=info
+ENV CONFIG_ROOT=/hvac_iot
 
 RUN apt-get update && apt-get install -y openssl && apt-get clean
 

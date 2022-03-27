@@ -4,6 +4,8 @@ MQTT -> InfluxDB processor for HVAC-IoT project
 
 ## Config
 
+Config file location is `${CONFIG_ROOT}/app.config`
+
 ```
 [{hvac_iot, [
     {mqtt_host, "localhost"},
