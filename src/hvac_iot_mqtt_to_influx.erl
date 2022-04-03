@@ -229,7 +229,7 @@ send_to_influxdb(Line) ->
 
     Query = uri_string:compose_query([{"org", Org}, {"bucket", Bucket}, {"precision", "s"}]),
     Path = "/api/v2/write?" ++ Query,
-    URL = "http://" ++ Host ++ ":" ++ SPort ++ Path,
+    URL = Host ++ ":" ++ SPort ++ Path,
     ?LOG_DEBUG(#{
         what => "Influx Line Request",
         host => Host,
