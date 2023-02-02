@@ -10,7 +10,6 @@
         inets,
         public_key,
         ssl,
-        logger,
         hackney,
         opentelemetry_api,
         opentelemetry,

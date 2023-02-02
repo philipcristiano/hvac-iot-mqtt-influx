@@ -16,11 +16,9 @@ let
 in stdenv.mkDerivation {
   name = "env";
   buildInputs = [ pkgs.gnumake
-                  pkgs.erlangR25
+                  pkgs.erlangR24
                   pkgs.rebar3
-                  pkgs.elixir_1_14
                   pkgs.wget
-                  pkgs.beam.packages.erlang.elixir
 
                   pkgs.rebar
 
@@ -30,11 +28,6 @@ in stdenv.mkDerivation {
                 ] ++ extraInputs;
   shellHook = ''
         source .env
-
-        export MIX_REBAR=$PWD/rebar3
-
-        mix local.hex --force
-
   '';
 
 }
