@@ -167,7 +167,7 @@ handle_info({publish, Msg = #{topic := <<"/metrics">>, payload := Payload}}, Sta
     {noreply, State};
 handle_info({publish, Msg = #{topic := <<"/metrics_json">>, payload := Payload}}, State) ->
     ?with_span(
-        <<"child">>,
+        <<"handle_info_mqtt">>,
         #{},
         fun(_Ctx) ->
             Data = jsx:decode(Payload, [return_maps]),
@@ -248,7 +248,13 @@ send_to_influxdb(Line) ->
 
     Headers = [{<<"Authorization">>, erlang:list_to_binary("Token " ++ Token)}],
 
-    Resp = hackney:request(post, URL, Headers, Line, []),
+    Resp = ?with_span(
+        <<"influxdb_post">>,
+        #{},
+        fun(_Ctx) ->
+            hackney:request(post, URL, Headers, Line, [])
+        end
+    ),
     handle_influxdb_response(URL, Resp).
 
 handle_influxdb_response(URL, {ok, Code, RespHeaders, ClientRef}) ->
