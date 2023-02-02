@@ -1,29 +1,34 @@
-PROJECT = hvac_iot
-PROJECT_DESCRIPTION = New project
-PROJECT_VERSION = 0.1.0
+.PHONY: deps
+deps:
+	./rebar3 deps
 
-DEPS = \
-	emqtt \
-	eraven \
-	hackney \
-	jsx
-BUILD_DEPS = \
-	version.mk \
-	erlfmt
+.PHONY: compile
+compile:
+	./rebar3 compile
 
-dep_emqtt = git https://github.com/emqx/emqtt.git v1.2.3
-dep_eraven = git https://github.com/getkimball/eraven.git 2020-05-20
-dep_erlfmt = git https://github.com/WhatsApp/erlfmt.git v0.8.0
-dep_hackney = hex 1.17.4
-dep_jsx = git https://github.com/talentdeficit/jsx.git v2.10.0
-dep_version.mk = git https://github.com/manifest/version.mk.git v0.2.0
+.PHONY: shell
+shell: compile
+	./rebar3 shell
 
-SHELL_OPTS = -eval 'application:ensure_all_started(hvac_iot).' -config sys +S2
+.PHONY: dialyze
+dialyze:
+	./rebar3 dialyzer
+
+.PHONY: test
+test:
+	rm -rf _build/test/cover
+	./rebar3 eunit
+
+.PHONY: rel
+rel:
+	./rebar3 release
+
+.PHONY: tar
+tar:
+	./rebar3 tar
 
 erlfmt:
-	$(gen_verbose) $(SHELL_ERL) -pa $(SHELL_PATHS) -eval 'erlfmt_cli:do("erlfmt", [write, {files, ["src/*.erl", "tests/*.erl"]} ]), halt(0)'
+	./rebar3 fmt -w
 
 erlfmt_check:
-	$(gen_verbose) $(SHELL_ERL) -pa $(SHELL_PATHS) -eval 'erlfmt_cli:do("erlfmt", [check, {files, ["src/*.erl", "tests/*.erl"]} ]), halt(0)'
-
-include erlang.mk
+	./rebar3 fmt --check

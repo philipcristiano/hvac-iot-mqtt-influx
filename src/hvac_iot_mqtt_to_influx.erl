@@ -131,8 +131,8 @@ handle_cast(connect_mqtt, State = #state{}) ->
             }),
 
             SubOpts = [{qos, 1}],
-            {ok, _Props, _ReasonCodes} = emqtt:subscribe(MCP, #{}, [{<<"/metrics">>, SubOpts}]),
-            {ok, _Props, _ReasonCodes} = emqtt:subscribe(MCP, #{}, [{<<"/metrics_json">>, SubOpts}]),
+            {ok, _, _} = emqtt:subscribe(MCP, #{}, [{<<"/metrics">>, SubOpts}]),
+            {ok, _, _} = emqtt:subscribe(MCP, #{}, [{<<"/metrics_json">>, SubOpts}]),
 
             {noreply, State#state{mqtt_client_pid = MCP}};
         {error, Reason} ->
