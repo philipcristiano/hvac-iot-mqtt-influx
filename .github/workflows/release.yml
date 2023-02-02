@@ -1,12 +1,8 @@
-name: Main Branch Deploy
+name: Tagged release
 
 on:
-  push:
-    branches:
-      - main
-    tags:
-      - "*"
-
+  tags:
+      - "v*.*.*"
 jobs:
 
   erlang:
