@@ -1,0 +1,24 @@
+{application, hvac_iot, [
+    {description, "An OTP application"},
+    {vsn, "0.1.0"},
+    {registered, []},
+    {mod, {bizops_app, []}},
+    {applications, [
+        kernel,
+        stdlib,
+        sasl,
+        logger,
+        hackney,
+        opentelemetry_api,
+        opentelemetry,
+        opentelemetry_telemetry,
+        opentelemetry_process_propagator,
+        telemetry,
+        jsx
+    ]},
+    {env, []},
+    {modules, []},
+
+    {licenses, []},
+    {links, []}
+]}.
