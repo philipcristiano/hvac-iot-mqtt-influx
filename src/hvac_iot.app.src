@@ -8,6 +8,7 @@
         stdlib,
         sasl,
         inets,
+        public_key,
         ssl,
         logger,
         hackney,
