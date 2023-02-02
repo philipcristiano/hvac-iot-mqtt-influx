@@ -10,6 +10,7 @@
         inets,
         public_key,
         ssl,
+        emqtt,
         hackney,
         opentelemetry_api,
         opentelemetry,
