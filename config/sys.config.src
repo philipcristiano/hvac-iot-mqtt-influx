@@ -6,4 +6,14 @@
     {handler, default, logger_std_h, #{}}
   ]}
 ]},
+
+ {opentelemetry,
+  [
+   {resource, [{service, #{name => "hvac_iot"}}]},
+   {span_processor, batch},
+   {sampler, {otel_sampler_always_on, #{}}},
+   {traces_exporter, otlp}
+   %{traces_exporter, {otel_exporter_stdout, []}}
+ ]},
+
 "${CONFIG_ROOT}/app"].

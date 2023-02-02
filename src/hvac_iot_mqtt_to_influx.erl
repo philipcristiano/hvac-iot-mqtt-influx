@@ -9,6 +9,7 @@
 -module(hvac_iot_mqtt_to_influx).
 
 -include_lib("kernel/include/logger.hrl").
+-include_lib("opentelemetry_api/include/otel_tracer.hrl").
 
 -behaviour(gen_server).
 
@@ -165,16 +166,22 @@ handle_info({publish, Msg = #{topic := <<"/metrics">>, payload := Payload}}, Sta
     send_to_influxdb(Payload),
     {noreply, State};
 handle_info({publish, Msg = #{topic := <<"/metrics_json">>, payload := Payload}}, State) ->
-    Data = jsx:decode(Payload, [return_maps]),
-    InfluxMsg = metric_data_to_influx_line(Data),
-    send_to_influxdb(InfluxMsg),
-    ?LOG_DEBUG(#{
-        what => metrics_json_message,
-        payload => Payload,
-        influx_msg => InfluxMsg,
-        msg => Msg
-    }),
-    {noreply, State};
+    ?with_span(
+        <<"child">>,
+        #{},
+        fun(_Ctx) ->
+            Data = jsx:decode(Payload, [return_maps]),
+            InfluxMsg = metric_data_to_influx_line(Data),
+            send_to_influxdb(InfluxMsg),
+            ?LOG_DEBUG(#{
+                what => metrics_json_message,
+                payload => Payload,
+                influx_msg => InfluxMsg,
+                msg => Msg
+            }),
+            {noreply, State}
+        end
+    );
 handle_info({'EXIT', Pid, Reason}, State = #state{mqtt_client_pid = Pid}) ->
     ?LOG_INFO(#{
         what => "MQTT Connect process exited, will try again",
