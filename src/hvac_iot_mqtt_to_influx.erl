@@ -250,7 +250,12 @@ send_to_influxdb(Line) ->
 
     Resp = ?with_span(
         <<"influxdb_post">>,
-        #{},
+        #{
+            attributes => #{
+                <<"influx.bucket">> => Bucket,
+                <<"influx.org">> => Org
+            }
+        },
         fun(_Ctx) ->
             hackney:request(post, URL, Headers, Line, [])
         end

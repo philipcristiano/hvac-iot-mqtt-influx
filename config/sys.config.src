@@ -3,8 +3,13 @@
   {logger_level, ${LOG_LEVEL}},
   {logger, [
     %% Console logger
-    {handler, default, logger_std_h, #{}}
-  ]}
+    {handler, default, logger_std_h, #{formatter => {jsonformat, #{new_line => true,
+                                                                   key_mapping => #{ level => severity,
+                                                                                     report => message}}}}
+    },
+    {handle_otp_reports, false},
+    {handle_sasl_reports, false}
+ ]}
 ]},
 
  {opentelemetry,
