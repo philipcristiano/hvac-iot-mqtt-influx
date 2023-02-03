@@ -66,7 +66,7 @@ connect_mqtt() ->
 %% @end
 %%--------------------------------------------------------------------
 init([]) ->
-    ?LOG_INFO(#{what => "MQTT-to-InfluxDB starting"}),
+    ?LOG_INFO(#{message => "MQTT-to-InfluxDB starting"}),
     process_flag(trap_exit, true),
 
     connect_mqtt(),
@@ -106,11 +106,11 @@ handle_cast(connect_mqtt, State = #state{}) ->
     Pass = application:get_env(hvac_iot, mqtt_password, "mqtt"),
 
     ?LOG_INFO(#{
-        what => "MQTT-to-InfluxDB service sleep starting",
+        message => "MQTT-to-InfluxDB service sleep starting",
         host => Host
     }),
     ?LOG_INFO(#{
-        what => "MQTT-to-InfluxDB service wake starting",
+        message => "MQTT-to-InfluxDB service wake starting",
         host => Host
     }),
     {ok, MCP} = emqtt:start_link([
@@ -120,14 +120,14 @@ handle_cast(connect_mqtt, State = #state{}) ->
         {password, Pass}
     ]),
     ?LOG_INFO(#{
-        what => "MQTT-to-InfluxDB connecting",
+        message => "MQTT-to-InfluxDB connecting",
         host => Host
     }),
 
     case emqtt:connect(MCP) of
         {ok, _Props} ->
             ?LOG_INFO(#{
-                what => "MQTT-to-InfluxDB connection attempt",
+                message => "MQTT-to-InfluxDB connection attempt",
                 host => Host
             }),
 
@@ -138,7 +138,7 @@ handle_cast(connect_mqtt, State = #state{}) ->
             {noreply, State#state{mqtt_client_pid = MCP}};
         {error, Reason} ->
             ?LOG_INFO(#{
-                what => "MQTT-to-InfluxDB connection attempt failed",
+                message => "MQTT-to-InfluxDB connection attempt failed",
                 host => Host,
                 reason => Reason
             }),
@@ -159,7 +159,7 @@ handle_cast(_Msg, State) ->
 %%--------------------------------------------------------------------
 handle_info({publish, Msg = #{topic := <<"/metrics">>, payload := Payload}}, State) ->
     ?LOG_DEBUG(#{
-        what => metrics_message,
+        message => metrics_message,
         payload => Payload,
         msg => Msg
     }),
@@ -174,7 +174,7 @@ handle_info({publish, Msg = #{topic := <<"/metrics_json">>, payload := Payload}}
             InfluxMsg = metric_data_to_influx_line(Data),
             send_to_influxdb(InfluxMsg),
             ?LOG_DEBUG(#{
-                what => metrics_json_message,
+                message => metrics_json_message,
                 payload => Payload,
                 influx_msg => InfluxMsg,
                 msg => Msg
@@ -184,7 +184,7 @@ handle_info({publish, Msg = #{topic := <<"/metrics_json">>, payload := Payload}}
     );
 handle_info({'EXIT', Pid, Reason}, State = #state{mqtt_client_pid = Pid}) ->
     ?LOG_INFO(#{
-        what => "MQTT Connect process exited, will try again",
+        message => "MQTT Connect process exited, will try again",
         pid => Pid,
         reason => Reason
     }),
@@ -238,7 +238,7 @@ send_to_influxdb(Line) ->
     Path = "/api/v2/write?" ++ Query,
     URL = Host ++ ":" ++ SPort ++ Path,
     ?LOG_DEBUG(#{
-        what => "Influx Line Request",
+        message => "Influx Line Request",
         host => Host,
         port => Port,
         org => Org,
@@ -265,7 +265,7 @@ send_to_influxdb(Line) ->
 handle_influxdb_response(URL, {ok, Code, RespHeaders, ClientRef}) ->
     {ok, Body} = hackney:body(ClientRef),
     ?LOG_DEBUG(#{
-        what => "Influx Line Request Response",
+        message => "Influx Line Request Response",
         url => URL,
         code => Code,
         body => Body,
@@ -277,7 +277,7 @@ handle_influxdb_response(URL, {ok, Code, RespHeaders, ClientRef}) ->
             ok;
         _ ->
             ?LOG_ERROR(#{
-                what => influx_http_error,
+                message => influx_http_error,
                 url => URL,
                 response => Body
             })
@@ -286,7 +286,7 @@ handle_influxdb_response(URL, {ok, Code, RespHeaders, ClientRef}) ->
     ok;
 handle_influxdb_response(URL, {error, econnrefused}) ->
     ?LOG_INFO(#{
-        what => "Influx HTTP Connection refused",
+        message => "Influx HTTP Connection refused",
         url => URL
     }),
     ok.
