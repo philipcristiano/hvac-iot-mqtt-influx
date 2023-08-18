@@ -3,8 +3,8 @@ let
   releasedPkgs = sysPkg.fetchFromGitHub {
     owner = "NixOS";
     repo = "nixpkgs";
-    rev = "22.11";
-    sha256 = "sha256-/HEZNyGbnQecrgJnfE8d0WC5c1xuPSD2LUpB6YXlg4c=";
+    rev = "23.05";
+    sha256 = "sha256-btHN1czJ6rzteeCuE/PNrdssqYD2nIA4w48miQAFloM=";
   };
   pkgs = import releasedPkgs {};
   stdenv = pkgs.stdenv;
@@ -12,22 +12,18 @@ let
     Cocoa
     CoreServices]);
 
-
 in stdenv.mkDerivation {
   name = "env";
   buildInputs = [ pkgs.gnumake
-                  pkgs.erlangR24
-                  pkgs.rebar3
                   pkgs.wget
-
-                  pkgs.rebar
-
-                # UI
-                  pkgs.foreman
-
+                  pkgs.cargo
+                  pkgs.rustc
+                  pkgs.rustfmt
+                  pkgs.rust-analyzer
+                  pkgs.libiconv
                 ] ++ extraInputs;
   shellHook = ''
-        source .env
+
   '';
 
 }
