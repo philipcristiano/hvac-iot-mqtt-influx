@@ -1,24 +1,18 @@
+FROM rust:1.67 as builder
+WORKDIR /usr/src/app
 
-FROM erlang:24 AS BUILDER
-RUN mkdir -p /app/hvac_iot
-ADD Makefile rebar3 rebar.* /app/hvac_iot
-WORKDIR /app/hvac_iot
-RUN make compile
+COPY Cargo.toml Cargo.lock /usr/src/app/
+RUN \
+    mkdir /usr/src/app/src && \
+    echo 'fn main() {}' > /usr/src/app/src/main.rs && \
+    cargo build --release && \
+    rm -Rvf /usr/src/app/src
 
-ADD . /app/hvac_iot
-RUN make compile
-RUN make tar && mv /app/hvac_iot/_build/default/rel/hvac_iot_release/hvac_iot_release-*.tar.gz /app.tar.gz
+COPY . .
+RUN cargo install --path .
 
+FROM debian:bullseye-slim
+RUN apt-get update && apt-get install -y procps && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /usr/local/cargo/bin/hvac_iot /usr/local/bin/hvac_iot
 
-FROM debian:bullseye
-
-ENV LOG_LEVEL=info
-RUN apt-get update && apt-get install -y openssl && apt-get clean
-COPY --from=BUILDER /app.tar.gz /app.tar.gz
-
-WORKDIR /app
-EXPOSE 8000
-
-RUN tar -xzf /app.tar.gz
-
-CMD ["/app/bin/hvac_iot_release", "foreground"]
+ENTRYPOINT ["/usr/local/bin/hvac_iot"]

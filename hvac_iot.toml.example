@@ -1,0 +1,14 @@
+
+[mqtt]
+host = "mqtt.example.com"
+port = 1883
+id = "hvac_iot_dev"
+username = "hvac_iot"
+password = "mqtt-password"
+
+[influxdb]
+host = "https://influxdb.example.com"
+bucket = "environment"
+token = "influxdb-token"
+
+
