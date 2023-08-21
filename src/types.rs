@@ -20,13 +20,7 @@ pub struct EventMeta {
 #[derive(Clone, Debug, Deserialize)]
 #[serde(untagged)]
 pub enum EventData {
-    Simple {
-        rssi: i32,
-        temp_c: f32,
-        rh: f32,
-        vbat: f32,
-    },
-    SimpleCO2 {
+    CO2 {
         rssi: i32,
         vbat: f32,
         #[serde(alias = "mBar")]
@@ -36,16 +30,18 @@ pub enum EventData {
         pm100: u16,
         pm25: u16,
     },
-    CO2 {
+    ECO2 {
+        rssi: i32,
+        vbat: f32,
+        rh: f32,
+        co2: u32,
+        tvoc: u32,
+    },
+    Simple {
         rssi: i32,
         temp_c: f32,
         rh: f32,
         vbat: f32,
-        mbar: f32,
-        co2: u32,
-        pm10: u16,
-        pm100: u16,
-        pm25: u16,
     },
 }
 
@@ -63,6 +59,7 @@ pub struct WritableEvent {
     rh: Option<f32>,
     vbat: f32,
     mbar: Option<f32>,
+    tvoc: Option<u32>,
     co2: Option<u32>,
     pm10: Option<u16>,
     pm100: Option<u16>,
@@ -87,12 +84,35 @@ impl From<Event> for WritableEvent {
                 rh: Some(rh),
                 vbat,
                 mbar: None,
+                tvoc: None,
                 co2: None,
                 pm10: None,
                 pm100: None,
                 pm25: None,
             },
-            EventData::SimpleCO2 {
+            EventData::ECO2 {
+                rssi,
+                vbat,
+                tvoc,
+                rh,
+                co2,
+            } => WritableEvent {
+                time: chrono::offset::Utc::now(),
+                name: e.meta.name,
+                id_hex: e.meta.id_hex,
+                sid: e.meta.sid,
+                rssi,
+                temp_c: None,
+                rh: Some(rh),
+                vbat,
+                mbar: None,
+                tvoc: Some(tvoc),
+                co2: Some(co2),
+                pm10: None,
+                pm100: None,
+                pm25: None,
+            },
+            EventData::CO2 {
                 rssi,
                 vbat,
                 mbar,
@@ -110,31 +130,7 @@ impl From<Event> for WritableEvent {
                 rh: None,
                 vbat,
                 mbar: Some(mbar),
-                co2: Some(co2),
-                pm10: Some(pm10),
-                pm100: Some(pm100),
-                pm25: Some(pm25),
-            },
-            EventData::CO2 {
-                rssi,
-                temp_c,
-                rh,
-                vbat,
-                mbar,
-                co2,
-                pm10,
-                pm100,
-                pm25,
-            } => WritableEvent {
-                time: chrono::offset::Utc::now(),
-                name: e.meta.name,
-                id_hex: e.meta.id_hex,
-                sid: e.meta.sid,
-                rssi,
-                temp_c: Some(temp_c),
-                rh: Some(rh),
-                vbat,
-                mbar: Some(mbar),
+                tvoc: None,
                 co2: Some(co2),
                 pm10: Some(pm10),
                 pm100: Some(pm100),
