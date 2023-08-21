@@ -33,6 +33,7 @@ pub enum EventData {
     ECO2 {
         rssi: i32,
         vbat: f32,
+        temp_c: f32,
         rh: f32,
         co2: u32,
         tvoc: u32,
@@ -94,6 +95,7 @@ impl From<Event> for WritableEvent {
                 rssi,
                 vbat,
                 tvoc,
+                temp_c,
                 rh,
                 co2,
             } => WritableEvent {
@@ -102,7 +104,7 @@ impl From<Event> for WritableEvent {
                 id_hex: e.meta.id_hex,
                 sid: e.meta.sid,
                 rssi,
-                temp_c: None,
+                temp_c: Some(temp_c),
                 rh: Some(rh),
                 vbat,
                 mbar: None,
