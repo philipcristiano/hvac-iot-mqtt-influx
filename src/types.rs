@@ -29,7 +29,8 @@ pub enum EventData {
     SimpleCO2 {
         rssi: i32,
         vbat: f32,
-        mBar: f32,
+        #[serde(alias = "mBar")]
+        mbar: f32,
         co2: u32,
         pm10: u16,
         pm100: u16,
@@ -94,7 +95,7 @@ impl From<Event> for WritableEvent {
             EventData::SimpleCO2 {
                 rssi,
                 vbat,
-                mBar,
+                mbar,
                 co2,
                 pm10,
                 pm100,
@@ -108,7 +109,7 @@ impl From<Event> for WritableEvent {
                 temp_c: None,
                 rh: None,
                 vbat,
-                mbar: Some(mBar),
+                mbar: Some(mbar),
                 co2: Some(co2),
                 pm10: Some(pm10),
                 pm100: Some(pm100),
