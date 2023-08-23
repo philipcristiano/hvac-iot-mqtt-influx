@@ -32,7 +32,7 @@ async fn main() {
 
     let app_config: AppConfig =
         toml::from_str(&config_file_contents).expect("Problems parsing config file");
-    println!("Config {:?}", app_config);
+    tracing::debug!("Config {:?}", app_config);
     let influx_client = Client::new(app_config.influxdb.host, app_config.influxdb.bucket)
         .with_token(app_config.influxdb.token);
 
@@ -50,22 +50,22 @@ async fn main() {
         };
         if let Some(ep) = event_payload {
             let metric = types::parse(ep);
-            println!("Event = {:?}", &metric);
+            tracing::debug!("Event = {:?}", &metric);
             let new_client = influx_client.clone();
             if let Some(event) = metric {
                 tokio::spawn(async move { post_event(new_client, event).await });
             }
         }
     }
-    // tracing::info!("listening on {}", addr);
 }
 
 async fn post_event(client: Client, e: types::Event) -> () {
     let writable: types::WritableEvent = e.into();
     let query = writable.into_query("sensor_reading");
+    tracing::debug!("Writable metric on {:?}", query);
     match client.query(query).await {
-        Ok(_r) => (),
-        Err(e) => println!("Error Posting to InfluxDB: {:?}", e),
+        Ok(r) => tracing::debug!("Result Posting to InfluxDB: {:?}", r),
+        Err(e) => tracing::error!("Error Posting to InfluxDB: {:?}", e),
     }
 }
 

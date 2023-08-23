@@ -81,74 +81,28 @@ impl From<Event> for WritableEvent {
                 id_hex: e.meta.id_hex,
                 sid: e.meta.sid,
                 rssi,
-                temp_c: Some(temp_c),
-                rh: Some(rh),
-                vbat,
-                mbar: None,
-                tvoc: None,
-                co2: None,
-                pm10: None,
-                pm100: None,
-                pm25: None,
-            },
-            EventData::ECO2 {
-                rssi,
-                vbat,
-                tvoc,
                 temp_c,
                 rh,
-                co2,
-            } => WritableEvent {
-                time: chrono::offset::Utc::now(),
-                name: e.meta.name,
-                id_hex: e.meta.id_hex,
-                sid: e.meta.sid,
-                rssi,
-                temp_c: Some(temp_c),
-                rh: Some(rh),
-                vbat,
-                mbar: None,
-                tvoc: Some(tvoc),
-                co2: Some(co2),
-                pm10: None,
-                pm100: None,
-                pm25: None,
-            },
-            EventData::CO2 {
-                rssi,
                 vbat,
                 mbar,
+                tvoc,
                 co2,
                 pm10,
                 pm100,
                 pm25,
-            } => WritableEvent {
-                time: chrono::offset::Utc::now(),
-                name: e.meta.name,
-                id_hex: e.meta.id_hex,
-                sid: e.meta.sid,
-                rssi,
-                temp_c: None,
-                rh: None,
-                vbat,
-                mbar: Some(mbar),
-                tvoc: None,
-                co2: Some(co2),
-                pm10: Some(pm10),
-                pm100: Some(pm100),
-                pm25: Some(pm25),
             },
         }
     }
 }
 pub fn parse(payload: String) -> Option<Event> {
     let e: Result<Event, _> = serde_json::from_str(&payload);
+    tracing::debug!("Payload {:?}", payload);
     if let Ok(e) = e {
         let mut e = e;
         e.time = Some(SystemTime::now());
         return Some(e);
     } else if let Err(er) = e {
-        println!("Could not parse payload {:?} due to {:?}", payload, er)
+        tracing::info!("Could not parse payload {:?} due to {:?}", payload, er)
     }
     return None;
 }

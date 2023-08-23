@@ -9,3 +9,5 @@ Options:
   -c, --config-file <CONFIG_FILE>  [default: hvac_iot.toml]
   -h, --help                       Print help
 ```
+
+Set Logging level with envvar `RUST_LOG` ex. `RUST_LOG=debug`
