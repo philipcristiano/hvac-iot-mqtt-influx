@@ -1,4 +1,3 @@
-use bytes::Bytes;
 use chrono::{DateTime, Utc};
 use influxdb::InfluxDbWriteable;
 use serde::Deserialize;
@@ -18,32 +17,18 @@ pub struct EventMeta {
 }
 
 #[derive(Clone, Debug, Deserialize)]
-#[serde(untagged)]
-pub enum EventData {
-    CO2 {
-        rssi: i32,
-        vbat: f32,
-        #[serde(alias = "mBar")]
-        mbar: f32,
-        co2: u32,
-        pm10: u16,
-        pm100: u16,
-        pm25: u16,
-    },
-    ECO2 {
-        rssi: i32,
-        vbat: f32,
-        temp_c: f32,
-        rh: f32,
-        co2: u32,
-        tvoc: u32,
-    },
-    Simple {
-        rssi: i32,
-        temp_c: f32,
-        rh: f32,
-        vbat: f32,
-    },
+pub struct EventData {
+    rssi: i32,
+    vbat: f32,
+    #[serde(alias = "mBar")]
+    mbar: Option<f32>,
+    co2: Option<u32>,
+    pm100: Option<u16>,
+    pm10: Option<u16>,
+    pm25: Option<u16>,
+    rh: Option<f32>,
+    temp_c: Option<f32>,
+    tvoc: Option<u32>,
 }
 
 #[derive(Clone, Debug, Deserialize, InfluxDbWriteable)]
@@ -70,10 +55,16 @@ pub struct WritableEvent {
 impl From<Event> for WritableEvent {
     fn from(e: Event) -> WritableEvent {
         match e.data {
-            EventData::Simple {
+            EventData {
+                tvoc,
+                co2,
+                mbar,
+                pm10,
+                pm100,
+                pm25,
+                rh,
                 rssi,
                 temp_c,
-                rh,
                 vbat,
             } => WritableEvent {
                 time: chrono::offset::Utc::now(),
