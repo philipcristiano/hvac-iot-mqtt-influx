@@ -1,7 +1,6 @@
 use std::fmt;
 
 use serde::Deserialize;
-use url::Url;
 
 use rumqttc::MqttOptions;
 
