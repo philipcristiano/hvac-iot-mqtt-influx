@@ -10,6 +10,10 @@ use std::str;
 pub struct Args {
     #[arg(short, long, default_value = "hvac_iot.toml")]
     config_file: String,
+    #[arg(short, long, value_enum, default_value = "INFO")]
+    log_level: tracing::Level,
+    #[arg(long, action)]
+    log_json: bool,
 }
 
 mod auth;
@@ -24,9 +28,15 @@ struct AppConfig {
 #[tokio::main]
 async fn main() {
     // initialize tracing
-    tracing_subscriber::fmt::init();
 
     let args = Args::parse();
+    let subscriber = tracing_subscriber::fmt().with_max_level(args.log_level);
+    if args.log_json {
+        subscriber.json().init()
+    } else {
+        subscriber.init()
+    };
+
     let config_file_error_msg = format!("Could not read config file {}", args.config_file);
     let config_file_contents = fs::read_to_string(args.config_file).expect(&config_file_error_msg);
 
@@ -68,12 +78,3 @@ async fn post_event(client: Client, e: types::Event) -> () {
         Err(e) => tracing::error!("Error Posting to InfluxDB: {:?}", e),
     }
 }
-
-// impl<E> From<E> for AuthError
-// where
-//     E: Into<anyhow::Error>,
-// {
-//     fn from(err: E) -> Self {
-//         Self(err.into())
-//     }
-// }
