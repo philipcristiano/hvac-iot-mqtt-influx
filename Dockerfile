@@ -1,4 +1,4 @@
-FROM rust:1.72 as builder
+FROM rust:1.72-bookworm as builder
 WORKDIR /usr/src/app
 
 COPY Cargo.toml Cargo.lock /usr/src/app/
@@ -11,7 +11,7 @@ RUN \
 COPY . .
 RUN cargo install --path .
 
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y procps && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /usr/local/cargo/bin/hvac_iot /usr/local/bin/hvac_iot
 
