@@ -15,3 +15,9 @@ jobs:
 
   rust:
     uses: "philipcristiano/workflows/.github/workflows/rust.yml@main"
+
+  flake:
+    uses: "philipcristiano/workflows/.github/workflows/nix.yml@main"
+    with:
+      script: |
+        cargo build
