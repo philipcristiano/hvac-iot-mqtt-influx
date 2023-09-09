@@ -40,7 +40,7 @@ pub struct WritableEvent {
     id_hex: String,
     #[influxdb(tag)]
     sid: String,
-    rssi: i32,
+    rssi: f32,
     temp_c: Option<f32>,
     rh: Option<f32>,
     vbat: f32,
@@ -71,7 +71,7 @@ impl From<Event> for WritableEvent {
                 name: e.meta.name,
                 id_hex: e.meta.id_hex,
                 sid: e.meta.sid,
-                rssi,
+                rssi: rssi as f32,
                 temp_c,
                 rh,
                 vbat,
