@@ -45,11 +45,11 @@ pub struct WritableEvent {
     rh: Option<f32>,
     vbat: f32,
     mbar: Option<f32>,
-    tvoc: Option<u32>,
-    co2: Option<u32>,
-    pm10: Option<u16>,
-    pm100: Option<u16>,
-    pm25: Option<u16>,
+    tvoc: Option<f32>,
+    co2: Option<f32>,
+    pm10: Option<f32>,
+    pm100: Option<f32>,
+    pm25: Option<f32>,
 }
 
 impl From<Event> for WritableEvent {
@@ -76,11 +76,11 @@ impl From<Event> for WritableEvent {
                 rh,
                 vbat,
                 mbar,
-                tvoc,
-                co2,
-                pm10,
-                pm100,
-                pm25,
+                tvoc: tvoc.map(|i| i as f32),
+                co2: co2.map(|i| i as f32),
+                pm10: pm10.map(|i| i as f32),
+                pm100: pm100.map(|i| i as f32),
+                pm25: pm25.map(|i| i as f32),
             },
         }
     }
