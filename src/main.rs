@@ -1,7 +1,7 @@
 use clap::Parser;
 use influxdb::InfluxDbWriteable;
-use influxdb::{Client, Query, ReadQuery, Timestamp};
-use rumqttc::{AsyncClient, Event, Packet, Publish, QoS};
+use influxdb::Client;
+use rumqttc::{AsyncClient, Event, Packet, QoS};
 use serde::Deserialize;
 use std::fs;
 use std::str;
