@@ -4,16 +4,19 @@ on:
   push:
     branches:
       - main
-    tags:
-      - "*"
+
+permissions:
+  pull-requests: write
+  contents: write
 
 jobs:
 
   docker_push:
     name: "Push docker image"
     uses: "philipcristiano/workflows/.github/workflows/docker-build-push.yml@main"
+    needs: [flake, rust]
     with:
-      repository: philipcristiano/hvac-iot-mqtt-influx
+      repository: ${{ github.repository }}
       timeout: 25
 
     secrets:
@@ -22,6 +25,13 @@ jobs:
 
   rust:
     uses: "philipcristiano/workflows/.github/workflows/rust.yml@main"
+
+  rust_release:
+    uses: "philipcristiano/workflows/.github/workflows/rust_release.yml@main"
+    needs: [flake, rust]
+    secrets:
+      WF_GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+      CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
   flake:
     uses: "philipcristiano/workflows/.github/workflows/nix.yml@main"
