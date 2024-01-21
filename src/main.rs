@@ -1,8 +1,9 @@
 use clap::Parser;
-use influxdb::InfluxDbWriteable;
 use influxdb::Client;
+use influxdb::InfluxDbWriteable;
 use rumqttc::{AsyncClient, Event, Packet, QoS};
 use serde::Deserialize;
+use std::collections::BTreeMap;
 use std::fs;
 use std::str;
 
@@ -23,6 +24,18 @@ mod types;
 struct AppConfig {
     mqtt: auth::MQTTConfig,
     influxdb: auth::InfluxDBConfig,
+    sensor: Vec<SensorConfig>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+struct SensorConfig {
+    id_hex: String,
+    overwrite: SensorOverwriteConfig,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+struct SensorOverwriteConfig {
+    name: String,
 }
 
 #[tokio::main]
@@ -42,7 +55,14 @@ async fn main() {
 
     let app_config: AppConfig =
         toml::from_str(&config_file_contents).expect("Problems parsing config file");
+
     tracing::debug!("Config {:?}", app_config);
+    let name_overwrite_map = app_config
+        .sensor
+        .into_iter()
+        .map(|x| (x.id_hex.clone(), x.overwrite.name))
+        .collect::<BTreeMap<_, _>>();
+
     let influx_client = Client::new(app_config.influxdb.host, app_config.influxdb.bucket)
         .with_token(app_config.influxdb.token);
 
@@ -63,10 +83,27 @@ async fn main() {
             tracing::debug!("Event = {:?}", &metric);
             let new_client = influx_client.clone();
             if let Some(event) = metric {
-                tokio::spawn(async move { post_event(new_client, event).await });
+                let annotated_event = annotate_event(event, &name_overwrite_map);
+
+                tokio::spawn(async move { post_event(new_client, annotated_event).await });
             }
         }
     }
+}
+
+fn annotate_event(event: types::Event, overwrite: &BTreeMap<String, String>) -> types::Event {
+    let replacement_name = overwrite
+        .get(&event.meta.id_hex)
+        .unwrap_or(&event.meta.name);
+    let new_meta = types::EventMeta {
+        name: replacement_name.clone(),
+        ..event.meta
+    };
+    let new_event = types::Event {
+        meta: new_meta,
+        ..event
+    };
+    new_event
 }
 
 async fn post_event(client: Client, e: types::Event) -> () {

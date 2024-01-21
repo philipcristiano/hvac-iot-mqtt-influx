@@ -16,6 +16,13 @@ jobs:
     with:
       automerge: true
 
+  check-for-cc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: check-for-cc
+        id: check-for-cc
+        uses: agenthunt/conventional-commit-checker-action@v2.0.0
+
   docker_build:
     uses: "philipcristiano/workflows/.github/workflows/docker-build.yml@main"
     with:

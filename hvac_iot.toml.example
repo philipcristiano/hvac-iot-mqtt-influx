@@ -11,4 +11,8 @@ host = "https://influxdb.example.com"
 bucket = "environment"
 token = "influxdb-token"
 
-
+# Override the sensor name
+[[sensor]]
+id_hex = "hex_value"
+[sensor.overwrite]
+name = "New sensor name"
