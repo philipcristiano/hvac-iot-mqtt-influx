@@ -4,16 +4,16 @@ use serde::Deserialize;
 use std::time::SystemTime;
 #[derive(Clone, Debug, Deserialize)]
 pub struct Event {
-    data: EventData,
-    meta: EventMeta,
-    time: Option<SystemTime>,
+    pub data: EventData,
+    pub meta: EventMeta,
+    pub time: Option<SystemTime>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct EventMeta {
-    name: String,
-    id_hex: String,
-    sid: String,
+    pub name: String,
+    pub id_hex: String,
+    pub sid: String,
 }
 
 #[derive(Clone, Debug, Deserialize)]
