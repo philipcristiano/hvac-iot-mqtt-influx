@@ -9,12 +9,11 @@ on:
 jobs:
 
   automerge_dependabot:
-    permissions:
-      pull-requests: write
-      contents: write
     uses: "philipcristiano/workflows/.github/workflows/automerge_dependabot.yml@main"
     with:
       automerge: true
+    secrets:
+      WF_GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
 
   check-for-cc:
     runs-on: ubuntu-latest
