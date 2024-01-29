@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.7](https://github.com/philipcristiano/hvac-iot-mqtt-influx/compare/v0.1.6...v0.1.7) - 2024-01-29
+
+### Other
+- Update automerge
+- *(deps)* bump the patch-dependencies group with 1 update
+
 ## [0.1.6](https://github.com/philipcristiano/hvac-iot-mqtt-influx/compare/v0.1.5...v0.1.6) - 2024-01-22
 
 ### Other
