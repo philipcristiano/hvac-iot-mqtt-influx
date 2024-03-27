@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.7](https://github.com/philipcristiano/hvac-iot-mqtt-influx/compare/v0.1.6...v0.1.7) (2024-03-27)
+
+
+### Bug Fixes
+
+* **deps:** update rust crate anyhow to 1.0.81 ([18a8ea3](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/18a8ea3cef1ad2dffc9a2d6b43ba9bfa8fd0332f))
+* **deps:** update rust crate bytes to 1.6.0 ([b5a8e0c](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/b5a8e0c34ca0fa59be636a7906110712ed694beb))
+* **deps:** update rust crate chrono to 0.4.36 ([ffc44de](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/ffc44de67e1be8c161bb2bfd26b1781ee3440b8e))
+* **deps:** update rust crate chrono to 0.4.37 ([b05fdff](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/b05fdff0ce0749e46322199b9e888ecac0b74817))
+* **deps:** update rust crate clap to 4.5.3 ([eaec136](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/eaec136558f4cb4165baaba05df1ad7a022024b9))
+* **deps:** update rust crate clap to 4.5.4 ([934f91c](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/934f91c4b7f8d02df94a853e3e5e99ea9915d606))
+* **deps:** update rust crate toml to 0.8.11 ([23862bd](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/23862bdc2e90793e8bf2d7084cbac9b6cbcfbfba))
+* **deps:** update rust crate toml to 0.8.12 ([2e07729](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/2e0772993e0af34840f0acaa8c2cd6803a517774))
+
 ## [Unreleased]
 
 ## [0.1.6](https://github.com/philipcristiano/hvac-iot-mqtt-influx/compare/v0.1.5...v0.1.6) - 2024-01-22
