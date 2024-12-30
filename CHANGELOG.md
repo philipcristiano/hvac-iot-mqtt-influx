@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.8](https://github.com/philipcristiano/hvac-iot-mqtt-influx/compare/v0.1.7...v0.1.8) (2024-12-30)
+
+
+### Bug Fixes
+
+* **deps:** update rust crate anyhow to v1.0.95 ([#243](https://github.com/philipcristiano/hvac-iot-mqtt-influx/issues/243)) ([bc6c8f4](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/bc6c8f416847bd0c0a1cd01bdadc60816049182d))
+* **deps:** update rust crate serde to v1.0.217 ([#245](https://github.com/philipcristiano/hvac-iot-mqtt-influx/issues/245)) ([3e009aa](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/3e009aa345d0d575269143cdb95ea8eba7a28e93))
+* **deps:** update rust crate serde_json to v1.0.134 ([#241](https://github.com/philipcristiano/hvac-iot-mqtt-influx/issues/241)) ([a65b5c1](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/a65b5c1709e8b788a45544f7ec57e28b7b097220))
+
 ## [0.1.7](https://github.com/philipcristiano/hvac-iot-mqtt-influx/compare/v0.1.6...v0.1.7) (2024-12-11)
 
 
