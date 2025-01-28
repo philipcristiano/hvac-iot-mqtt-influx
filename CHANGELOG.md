@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.8](https://github.com/philipcristiano/hvac-iot-mqtt-influx/compare/v0.1.7...v0.1.8) (2025-01-28)
+
+
+### Bug Fixes
+
+* **deps:** update rust crate anyhow to v1.0.95 ([#243](https://github.com/philipcristiano/hvac-iot-mqtt-influx/issues/243)) ([bc6c8f4](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/bc6c8f416847bd0c0a1cd01bdadc60816049182d))
+* **deps:** update rust crate clap to v4.5.24 ([#249](https://github.com/philipcristiano/hvac-iot-mqtt-influx/issues/249)) ([ffcbd96](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/ffcbd96347f7532accc8783d1c68e14563589440))
+* **deps:** update rust crate clap to v4.5.25 ([#252](https://github.com/philipcristiano/hvac-iot-mqtt-influx/issues/252)) ([ffa5733](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/ffa5733b9846f859b04ada97f4b195baf5757c03))
+* **deps:** update rust crate clap to v4.5.26 ([#253](https://github.com/philipcristiano/hvac-iot-mqtt-influx/issues/253)) ([0444360](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/0444360a467a1d4d0abe94ca4fce6baacdfb07bb))
+* **deps:** update rust crate clap to v4.5.27 ([#258](https://github.com/philipcristiano/hvac-iot-mqtt-influx/issues/258)) ([3698d85](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/3698d859ebdc2cfee01fc8908143e5dbe8ded78f))
+* **deps:** update rust crate serde to v1.0.217 ([#245](https://github.com/philipcristiano/hvac-iot-mqtt-influx/issues/245)) ([3e009aa](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/3e009aa345d0d575269143cdb95ea8eba7a28e93))
+* **deps:** update rust crate serde_json to v1.0.134 ([#241](https://github.com/philipcristiano/hvac-iot-mqtt-influx/issues/241)) ([a65b5c1](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/a65b5c1709e8b788a45544f7ec57e28b7b097220))
+* **deps:** update rust crate serde_json to v1.0.135 ([#250](https://github.com/philipcristiano/hvac-iot-mqtt-influx/issues/250)) ([666c41b](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/666c41b272a349cc94254330fae0e26d782dad6f))
+* **deps:** update rust crate serde_json to v1.0.136 ([#255](https://github.com/philipcristiano/hvac-iot-mqtt-influx/issues/255)) ([5eebc19](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/5eebc198a19c321edfa16d4db49fe28405a0b107))
+* **deps:** update rust crate serde_json to v1.0.137 ([#256](https://github.com/philipcristiano/hvac-iot-mqtt-influx/issues/256)) ([4d7c55b](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/4d7c55be71f0b42f529ea0909d133a6c2b1b1d56))
+* **deps:** update rust crate serde_json to v1.0.138 ([#260](https://github.com/philipcristiano/hvac-iot-mqtt-influx/issues/260)) ([bc7c234](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/bc7c23466f0462468053ec90601549f2587b6a6a))
+* **deps:** update rust crate tokio to v1.43.0 ([#251](https://github.com/philipcristiano/hvac-iot-mqtt-influx/issues/251)) ([4d404e2](https://github.com/philipcristiano/hvac-iot-mqtt-influx/commit/4d404e235a0893bc119cea1d3575d07bbc01d994))
+
 ## [0.1.7](https://github.com/philipcristiano/hvac-iot-mqtt-influx/compare/v0.1.6...v0.1.7) (2024-12-11)
 
 
